@@ -1,0 +1,28 @@
+{
+  "name": "rgcingenieria",
+  "version": "1.0.0",
+  "description": "manejo proyectos RGC",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Manuel Segovia",
+  "license": "ISC",
+  "dependencies": {
+    "@hapi/boom": "^9.1.2",
+    "@hapi/hapi": "^20.1.2",
+    "aws-sdk": "^2.901.0",
+    "blipp": "^4.0.2",
+    "dotenv": "^8.2.0",
+    "hapi-mongodb": "^9.0.2",
+    "laabr": "^6.1.3",
+    "sharp": "^0.28.2"
+  },
+  "devDependencies": {
+    "eslint": "^7.25.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "nodemon": "^2.0.7"
+  }
+}
