@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "manejo proyectos RGC",
   "main": "index.js",
+  "engines": {
+    "node": "16.2.0"
+  },
   "scripts": {
+    "start": "node src/iindex.js",
     "dev": "nodemon src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
