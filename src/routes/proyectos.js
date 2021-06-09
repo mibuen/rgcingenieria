@@ -1,5 +1,5 @@
 const {
-  crearProyecto, inactivarProyecto, listaProyectos, modificarProyecto, agregarFoto, getProyecto,
+  crearProyecto, inactivarProyecto, listaProyectos, modificarProyecto, agregarFoto, getProyecto, creaReporte,
 } = require('../controllers/controlProyectos');
 
 const routeCrearProyecto = {
@@ -56,6 +56,15 @@ const routeAgregarFoto = {
     },
     description: 'upload fotos',
   },
+
+};
+const routeReporte = {
+  method: 'POST',
+  path: '/reporte',
+  handler: creaReporte,
+  options: {
+    description: 'modifica campos foto',
+  },
 };
 
 module.exports = [
@@ -65,4 +74,5 @@ module.exports = [
   routeModificarProyecto,
   routeAgregarFoto,
   routeGetProyecto,
+  routeReporte,
 ];
