@@ -60,7 +60,8 @@ const agregarFoto = async (request, h) => {
         return { message: 'invalid file' };
       }
       const fotoNombre = `${proyectoId}/${base}.webp`;
-      const img = file.pipe(transformer());
+      // const img = file.pipe(transformer());
+      const img = file;
       const toS3 = await myUpload(fotoNombre, img);
       const imgObj = {
         url: toS3.Location,
