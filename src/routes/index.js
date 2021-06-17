@@ -1,3 +1,4 @@
+const leonada = require('./leonada');
 const controlProyectos = require('./proyectos');
 
 const mainpage = {
@@ -6,4 +7,4 @@ const mainpage = {
   handler: async (request, h) => 'Hola Daniel',
 };
 
-module.exports = [mainpage, ...controlProyectos];
+module.exports = [mainpage, ...controlProyectos, ...leonada];

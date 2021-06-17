@@ -1,5 +1,6 @@
 const {
-  crearProyecto, inactivarProyecto, listaProyectos, modificarProyecto, agregarFoto, getProyecto, creaReporte,
+  crearProyecto, inactivarProyecto, listaProyectos, modificarProyecto,
+  agregarFoto, getProyecto, creaReporte, existeProyecto,
 } = require('../controllers/controlProyectos');
 
 const routeCrearProyecto = {
@@ -9,6 +10,11 @@ const routeCrearProyecto = {
   options: {
     description: 'crear proyecto en mongo',
   },
+};
+const existeProyectoRoute = {
+  method: 'GET',
+  path: '/verificar/{proyectoId}',
+  handler: existeProyecto,
 };
 const routeInactivarProyecto = {
   method: 'GET',
@@ -48,12 +54,12 @@ const routeAgregarFoto = {
   path: '/agregarfoto',
   handler: agregarFoto,
   options: {
-    payload: {
-      output: 'stream',
-      parse: true,
-      multipart: true,
-      maxBytes: 209715200,
-    },
+    // payload: {
+    //   output: 'stream',
+    //   parse: true,
+    //   multipart: true,
+    //   maxBytes: 209715200,
+    // },
     description: 'upload fotos',
   },
 
@@ -75,4 +81,5 @@ module.exports = [
   routeAgregarFoto,
   routeGetProyecto,
   routeReporte,
+  existeProyectoRoute,
 ];

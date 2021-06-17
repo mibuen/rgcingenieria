@@ -4,6 +4,14 @@ const { transformer } = require('../services/transform');
 
 const DB = (request, colName) => request.mongo.db.collection(colName);
 
+const existeProyecto = async (request, h) => {
+  const { proyectoId } = request.params;
+  console.log(proyectoId);
+  const response = await DB(request, 'proyectos').find({ proyectoId: parseInt(proyectoId, 10) }).count();
+  console.log(response);
+  return response !== 1 ? h.response({ message: 'proyecto no existe' }) : h.response({ message: 'proyecto valido' });
+};
+
 const crearProyecto = async (request, h) => {
   const { proyectoId } = request.payload;
   request.payload.proyectoId = parseInt(proyectoId, 10);
@@ -44,48 +52,64 @@ const modificarProyecto = async (request, h) => h.response('modificar proyectos,
 //++++++++++++++++++++++++++++++++++++++++++++
 // ++++++++ Agregar Fotos++++++++++++++++++
 
+// const agregarFoto = async (request, h) => {
+//   const validExt = ['jpeg', 'jpg', 'png', 'tif', 'webp', 'svg'];
+//   const { fotoFile, proyectoId } = request.payload;
+//   const fotoFiles = [].concat(fotoFile);
+//   try {
+//     const checkMongo = await DB(request, 'proyectos').find({ proyectoId: parseInt(proyectoId, 10) }).count();
+//     if (checkMongo !== 1) {
+//       return h.response({ message: 'proyecto no existe' });
+//     }
+//     const filesToS3 = await Promise.all(fotoFiles.map(async (file) => {
+//       const x = file.hapi.filename;
+//       const [base, ext] = x.split('.');
+//       if (!validExt.includes(ext.toLowerCase())) {
+//         return { message: 'invalid file' };
+//       }
+//       const fotoNombre = `${proyectoId}/${base}.webp`;
+//       // const img = file.pipe(transformer());
+//       const img = file;
+//       const toS3 = await myUpload(fotoNombre, img);
+//       const imgObj = {
+//         url: toS3.Location,
+//         comentarios: '',
+//         status: '',
+//         item: '',
+//       };
+//       const toMongo = await DB(request, 'proyectos').updateOne({ proyectoId: parseInt(proyectoId, 10) }, { $push: { fotos: { $each: [imgObj], $sort: { item: 1, status: 1 } } } });
+//       return (imgObj);
+//     }));
+//     const invalidFiles = filesToS3.filter((elem) => elem.message).length;
+//     const imgUrls = filesToS3.filter((elem) => !elem.message);
+//     const acceptedFiles = filesToS3.length - invalidFiles;
+//     return h.response({ message: `Files Saved: ${acceptedFiles}, rejected: ${invalidFiles}`, imgUrls });
+//   } catch (error) {
+//     console.log(error);
+//     throw error;
+//   }
+// };
 const agregarFoto = async (request, h) => {
-  const validExt = ['jpeg', 'jpg', 'png', 'tif', 'webp', 'svg'];
-  const { fotoFile, proyectoId } = request.payload;
-  const fotoFiles = [].concat(fotoFile);
+  const { proyectoId, key } = request.payload;
+  console.log(proyectoId, key);
+  const imgObj = {
+    key,
+    comentarios: '',
+    status: '',
+    item: '',
+  };
   try {
-    const checkMongo = await DB(request, 'proyectos').find({ proyectoId: parseInt(proyectoId, 10) }).count();
-    if (checkMongo !== 1) {
-      return h.response({ message: 'proyecto no existe' });
-    }
-    const filesToS3 = await Promise.all(fotoFiles.map(async (file) => {
-      const x = file.hapi.filename;
-      const [base, ext] = x.split('.');
-      if (!validExt.includes(ext.toLowerCase())) {
-        return { message: 'invalid file' };
-      }
-      const fotoNombre = `${proyectoId}/${base}.webp`;
-      // const img = file.pipe(transformer());
-      const img = file;
-      const toS3 = await myUpload(fotoNombre, img);
-      const imgObj = {
-        url: toS3.Location,
-        comentarios: '',
-        status: '',
-        item: '',
-      };
-      const toMongo = await DB(request, 'proyectos').updateOne({ proyectoId: parseInt(proyectoId, 10) }, { $push: { fotos: { $each: [imgObj], $sort: { item: 1, status: 1 } } } });
-      return (imgObj);
-    }));
-    const invalidFiles = filesToS3.filter((elem) => elem.message).length;
-    const imgUrls = filesToS3.filter((elem) => !elem.message);
-    const acceptedFiles = filesToS3.length - invalidFiles;
-    return h.response({ message: `Files Saved: ${acceptedFiles}, rejected: ${invalidFiles}`, imgUrls });
+    const toMongo = await DB(request, 'proyectos').updateOne({ proyectoId: parseInt(proyectoId, 10) }, { $push: { fotos: { $each: [imgObj], $sort: { item: 1, status: 1 } } } });
+    return { modified: toMongo.modifiedCount };
   } catch (error) {
-    console.log(error);
-    throw error;
+    throw Boom.serverUnavailable('mongo not available');
   }
 };
 const creaReporte = async (request, h) => {
   const {
-    proyectoId, url, item, status, comentarios,
+    proyectoId, key, item, status, comentarios,
   } = request.payload;
-  const query = { proyectoId: parseInt(proyectoId, 10), 'fotos.url': url };
+  const query = { proyectoId: parseInt(proyectoId, 10), 'fotos.key': key };
   const data = {
     'fotos.$.item': item,
     'fotos.$.comentarios': comentarios,
@@ -112,4 +136,5 @@ module.exports = {
   agregarFoto,
   getProyecto,
   creaReporte,
+  existeProyecto,
 };
