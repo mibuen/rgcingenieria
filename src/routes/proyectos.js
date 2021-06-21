@@ -37,7 +37,7 @@ const routeGetProyecto = {
   path: '/listado/{proyectoId}',
   handler: getProyecto,
   options: {
-    description: 'lista proyectos en mongo',
+    description: 'lista un proyecto en mongo',
   },
 };
 
@@ -54,12 +54,6 @@ const routeAgregarFoto = {
   path: '/agregarfoto',
   handler: agregarFoto,
   options: {
-    // payload: {
-    //   output: 'stream',
-    //   parse: true,
-    //   multipart: true,
-    //   maxBytes: 209715200,
-    // },
     description: 'upload fotos',
   },
 
