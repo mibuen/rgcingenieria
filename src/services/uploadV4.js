@@ -4,8 +4,8 @@ const { v4 } = require('uuid');
 
 const client = new S3Client({
   credentials: {
-    accessKeyId: process.env.KEY_ID,
-    secretAccessKey: process.env.SECRET_KEY,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   },
 });
 const uploadS3v4 = async (proyectoId, key) => {

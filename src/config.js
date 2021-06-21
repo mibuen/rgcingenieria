@@ -6,7 +6,6 @@ const {
   PORT,
   HOST,
   MONGO,
-
 } = process.env;
 module.exports = {
   nodeEnv: NODE_ENV,
