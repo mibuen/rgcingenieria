@@ -9,7 +9,7 @@ const {
 } = process.env;
 module.exports = {
   nodeEnv: NODE_ENV,
-  port: PORT,
+  port: +PORT,
   host: HOST,
   mongoDb: MONGO,
 };
