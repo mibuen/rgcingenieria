@@ -6,7 +6,7 @@ const client = new S3Client({
   credentials: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region: process.env.REGION,
+    region: 'us-east-1',
   },
 });
 const uploadS3v4 = async (proyectoId, key) => {
