@@ -2,12 +2,12 @@ const { S3Client } = require('@aws-sdk/client-s3');
 const { createPresignedPost } = require('@aws-sdk/s3-presigned-post');
 const { v4 } = require('uuid');
 
-// const client = new S3Client({
-//   credentials: {
-//     accessKeyId: process.env.KEY_ID,
-//     secretAccessKey: process.env.SECRET_KEY,
-//   },
-// });
+const client = new S3Client({
+  credentials: {
+    accessKeyId: process.env.KEY_ID,
+    secretAccessKey: process.env.SECRET_KEY,
+  },
+});
 const uploadS3v4 = async (proyectoId, key) => {
   const ext = key.split('.').pop();
   const Key = `${proyectoId}/${v4()}.${ext}`;
@@ -26,17 +26,11 @@ const uploadS3v4 = async (proyectoId, key) => {
     expires: 600,
   };
   try {
-    const client = new S3Client({
-      credentials: {
-        accessKeyId: process.env.KEY_ID,
-        secretAccessKey: process.env.SECRET_KEY,
-      },
-    });
     const { url, fields } = await createPresignedPost(client, options);
     return { url, fields };
   } catch (error) {
     console.log(error);
-    return { message: 'Error al solicitar post' };
+    return { PENDEJADA: error };
   }
 };
 
