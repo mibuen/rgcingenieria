@@ -27,7 +27,6 @@ const uploadS3v4 = async (proyectoId, key) => {
     expires: 600,
   };
   try {
-    console.log(proyectoId, Key);
     const { url, fields } = await createPresignedPost(client, options);
     return { url, fields };
   } catch (error) {
