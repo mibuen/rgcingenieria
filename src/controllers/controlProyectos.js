@@ -29,6 +29,8 @@ const crearProyecto = async (request, h) => {
 			(await DB(request, 'proyectos').find({ cotizacionId }).count()) + 1;
 		console.log('cotizacion', cotizacionId, 'proyectoId', proyectoId);
 		payload.proyectoId = proyectoId;
+		payload.descripcion = checkQuotte.descripcion;
+		payload.cliente = checkQuotte.cliente;
 		const proyecto = await DB(request, 'proyectos').insertOne(payload);
 		console.log(checkQuotte, proyecto.ops[0]);
 		const resultado = { ...checkQuotte, ...proyecto.ops[0] };
@@ -37,25 +39,18 @@ const crearProyecto = async (request, h) => {
 		return { message: 'error gachote' };
 	}
 };
-
-// const crearProyecto = async (request, h) => {
-//   const { proyectoId } = request.payload;
-//   request.payload.proyectoId = parseInt(proyectoId, 10);
-//   try {
-//     await request.mongo.db.collection('proyectos').createIndex({ proyectoId: 1 }, { unique: true });
-//     const proyecto = await DB(request, 'proyectos').insertOne(request.payload);
-//     return h.response(proyecto.ops[0]).code(201);
-//   } catch (error) {
-//     throw Boom.badRequest('duplicate project');
-//   }
-// };
+//###################################################
+//++++++++++Inactivar
 const inactivarProyecto = async (request, h) =>
 	h.response('proyecto inactivado');
 //++++++++++++++++++++++++++++++
 const listaProyectos = async (request, h) => {
 	const criteria = request.query;
 	try {
-		const proyectos = await DB(request, 'proyectos').find(criteria).toArray();
+		const proyectos = await DB(request, 'proyectos')
+			.find(criteria)
+			.sort({ cotizacionId: 1 })
+			.toArray();
 		return h.response(proyectos).code(200);
 	} catch (error) {
 		console.log(error);
