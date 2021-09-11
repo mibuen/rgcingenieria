@@ -2,6 +2,23 @@ const Boom = require('@hapi/boom');
 
 const DB = (request, colName) => request.mongo.db.collection(colName);
 
+const transform = (data) => {
+	return data.map((item) => {
+		return {
+			cotizacionId: item.cotizacionId,
+			proyectoId: item.proyectoId,
+			cliente: item.proyectos_ready.cliente,
+			descripcion: item.proyectos_ready.descripcion,
+			sitio: item.sitio,
+			direccion: item.direccion,
+			supervisor: item.supervisor,
+			status_proyecto: item.status_proyecto,
+			fecha_inicio: item.fechaInicio,
+			fecha_terminado: item.fechaTerminado,
+		};
+	});
+};
+
 const existeProyecto = async (request, h) => {
 	const { proyectoId } = request.params;
 	const response = await DB(request, 'proyectos')
@@ -29,8 +46,8 @@ const crearProyecto = async (request, h) => {
 			(await DB(request, 'proyectos').find({ cotizacionId }).count()) + 1;
 		console.log('cotizacion', cotizacionId, 'proyectoId', proyectoId);
 		payload.proyectoId = proyectoId;
-		payload.descripcion = checkQuotte.descripcion;
-		payload.cliente = checkQuotte.cliente;
+		//payload.descripcion = checkQuotte.descripcion;
+		//payload.cliente = checkQuotte.cliente;
 		const proyecto = await DB(request, 'proyectos').insertOne(payload);
 		console.log(checkQuotte, proyecto.ops[0]);
 		const resultado = { ...checkQuotte, ...proyecto.ops[0] };
@@ -45,12 +62,22 @@ const inactivarProyecto = async (request, h) =>
 	h.response('proyecto inactivado');
 //++++++++++++++++++++++++++++++
 const listaProyectos = async (request, h) => {
-	const criteria = request.query;
 	try {
-		const proyectos = await DB(request, 'proyectos')
-			.find(criteria)
-			.sort({ cotizacionId: 1 })
+		const data = await DB(request, 'proyectos')
+			.aggregate([
+				{
+					$lookup: {
+						from: 'cotizaciones',
+						localField: 'cotizacionId',
+						foreignField: 'cotizacionId',
+						as: 'proyectos_ready',
+					},
+				},
+				{ $unwind: '$proyectos_ready' },
+				{ $sort: { cotizacionId: 1, proyectoId: 1 } },
+			])
 			.toArray();
+		const proyectos = transform(data);
 		return h.response(proyectos).code(200);
 	} catch (error) {
 		console.log(error);
