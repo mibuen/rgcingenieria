@@ -15,6 +15,7 @@ const transform = (data) => {
 			status_proyecto: item.status_proyecto,
 			fecha_inicio: item.fechaInicio,
 			fecha_terminado: item.fechaTerminado,
+			fotos: item.fotos.length,
 		};
 	});
 };
@@ -102,18 +103,21 @@ const modificarProyecto = async (request, h) =>
 	h.response('modificar proyectos, ');
 //++++++++++++++++++++++++++++++++++++++++++++
 
+// ++++++++++agregar foto+++++++++++++++++++++++
 const agregarFoto = async (request, h) => {
-	const { proyectoId, key } = request.payload;
-	console.log(proyectoId, key);
+	const { cotizacionId, proyectoId, key, status, item } = request.payload;
+	console.log(cotizacionId, proyectoId, key);
 	const imgObj = {
 		key,
-		comentarios: '',
-		status: '',
-		item: '',
+		status,
+		item,
 	};
 	try {
 		const toMongo = await DB(request, 'proyectos').updateOne(
-			{ proyectoId: parseInt(proyectoId, 10) },
+			{
+				cotizacionId: parseInt(cotizacionId, 10),
+				proyectoId: parseInt(proyectoId, 10),
+			},
 			{ $push: { fotos: { $each: [imgObj], $sort: { item: 1, status: 1 } } } }
 		);
 		return { modified: toMongo.modifiedCount };
@@ -121,6 +125,7 @@ const agregarFoto = async (request, h) => {
 		throw Boom.serverUnavailable('mongo not available');
 	}
 };
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const creaReporte = async (request, h) => {
 	const { proyectoId, key, item, status, comentarios } = request.payload;
 	const query = { proyectoId: parseInt(proyectoId, 10), 'fotos.key': key };
