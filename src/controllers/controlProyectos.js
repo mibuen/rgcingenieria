@@ -15,7 +15,7 @@ const transform = (data) => {
 			status_proyecto: item.status_proyecto,
 			fecha_inicio: item.fechaInicio,
 			fecha_terminado: item.fechaTerminado,
-			fotos: item.fotos.length,
+			fotos: item.fotos ? item.fotos.length : 0,
 		};
 	});
 };
