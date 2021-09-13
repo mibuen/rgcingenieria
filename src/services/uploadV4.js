@@ -10,10 +10,11 @@ const client = new S3Client({
 	},
 });
 const uploadS3v4 = async (folder, key) => {
-	//console.log('folder', folder);
-	//console.log('FILE', key);
+	console.log('folder', folder);
+	console.log('FILE', key);
 	const ext = key.split('.').pop();
 	const Key = `${folder}/${v4()}.${ext}`;
+	console.log('Key', Key);
 	const Conditions = [
 		{ bucket: process.env.BUCKET },
 		['content-length-range', 0, 10000000],
