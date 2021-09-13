@@ -10,8 +10,9 @@ const client = new S3Client({
 	},
 });
 const uploadS3v4 = async (folder, key) => {
-	console.log('folder', folder);
-	console.log('FILE', key);
+	console.log('UPfolder', folder);
+	console.log('UPFILE', key);
+	console.log(key);
 	const ext = key.split('.').pop();
 	const Key = `${folder}/${v4()}.${ext}`;
 	console.log('Key', Key);
