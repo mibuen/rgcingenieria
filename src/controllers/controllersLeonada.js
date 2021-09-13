@@ -6,7 +6,7 @@ const getS3postController = async (request, h) => {
 	console.log(cotizacionId);
 	console.log(proyectoId);
 
-	const folder = `${cotizacionId}/${proyectoId}`;
+	const folder = `${cotizacionId}-${proyectoId}`;
 	console.log(folder);
 	return uploadS3v4(folder, key);
 };
