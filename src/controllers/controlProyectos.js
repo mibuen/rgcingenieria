@@ -15,7 +15,7 @@ const transform = (data) => {
 			status_proyecto: item.status_proyecto,
 			fecha_inicio: item.fechaInicio,
 			fecha_terminado: item.fechaTerminado,
-			fotos: item.fotos ? item.fotos.length : 0,
+			vistas: item.vistas ? item.vistas.length : 0,
 		};
 	});
 };
@@ -104,27 +104,47 @@ const modificarProyecto = async (request, h) =>
 //++++++++++++++++++++++++++++++++++++++++++++
 
 // ++++++++++agregar foto+++++++++++++++++++++++
+// const agregarFoto = async (request, h) => {
+// 	const { cotizacionId, proyectoId, key, status, item } = request.payload;
+// 	console.log(cotizacionId, proyectoId, key);
+// 	const imgObj = {
+// 		key,
+// 		status,
+// 		item,
+// 	};
+// 	try {
+// 		const toMongo = await DB(request, 'proyectos').updateOne(
+// 			{
+// 				cotizacionId: parseInt(cotizacionId, 10),
+// 				proyectoId: parseInt(proyectoId, 10),
+// 			},
+// 			{ $push: { fotos: { $each: [imgObj], $sort: { item: 1, status: 1 } } } }
+// 		);
+// 		return { modified: toMongo.modifiedCount };
+// 	} catch (error) {
+// 		throw Boom.serverUnavailable('mongo not available');
+// 	}
+// };
 const agregarFoto = async (request, h) => {
-	const { cotizacionId, proyectoId, key, status, item } = request.payload;
-	console.log(cotizacionId, proyectoId, key);
-	const imgObj = {
-		key,
-		status,
-		item,
+	const { cotizacionId, proyectoId, tipo, key } = request.payload;
+	const query = {
+		cotizacionId: parseInt(cotizacionId, 10),
+		proyectoId: parseInt(proyectoId, 10),
 	};
 	try {
-		const toMongo = await DB(request, 'proyectos').updateOne(
-			{
-				cotizacionId: parseInt(cotizacionId, 10),
-				proyectoId: parseInt(proyectoId, 10),
-			},
-			{ $push: { fotos: { $each: [imgObj], $sort: { item: 1, status: 1 } } } }
-		);
+		if (tipo !== 'inicio') throw Error('tipo foto no es inicio');
+		const proyecto = await DB(request, 'proyectos').findOne(query);
+		const item = proyecto.vistas ? proyecto.vistas.length : 1;
+		console.log(item);
+		const toMongo = await DB(request, 'proyectos').updateOne(query, {
+			$push: { vistas: { item, inicio: key, final: 'tbd.png' } },
+		});
 		return { modified: toMongo.modifiedCount };
 	} catch (error) {
-		throw Boom.serverUnavailable('mongo not available');
+		return Boom.badData(error);
 	}
 };
+//return 'message quien sabe';
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const creaReporte = async (request, h) => {
 	const { proyectoId, key, item, status, comentarios } = request.payload;
