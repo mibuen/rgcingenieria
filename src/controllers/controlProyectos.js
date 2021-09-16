@@ -8,7 +8,7 @@ const transform = (data) => {
 			cotizacionId: item.cotizacionId,
 			proyectoId: item.proyectoId,
 			cliente: item.proyectos_ready.cliente,
-			descripcion: item.proyectos_ready.descripcion,
+			trabajo: item.proyectos_ready.trabajo,
 			sitio: item.sitio,
 			direccion: item.direccion,
 			supervisor: item.supervisor,
@@ -47,8 +47,6 @@ const crearProyecto = async (request, h) => {
 			(await DB(request, 'proyectos').find({ cotizacionId }).count()) + 1;
 		console.log('cotizacion', cotizacionId, 'proyectoId', proyectoId);
 		payload.proyectoId = proyectoId;
-		//payload.descripcion = checkQuotte.descripcion;
-		//payload.cliente = checkQuotte.cliente;
 		const proyecto = await DB(request, 'proyectos').insertOne(payload);
 		console.log(checkQuotte, proyecto.ops[0]);
 		const resultado = { ...checkQuotte, ...proyecto.ops[0] };
