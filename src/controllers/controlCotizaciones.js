@@ -14,7 +14,6 @@ exports.crearCotizacion = async (request, h) => {
 		data.emision = new Date(data.emision);
 		data.captura = new Date();
 		data.cotizacionId = cotizacionArray.length + 1;
-		console.log('TYPE', typeof data.cotizacionId);
 		return insertCotizacion(request, data);
 	} catch (error) {
 		return Boom.badRequest('duplicate cotizaciones');

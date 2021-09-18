@@ -1,7 +1,7 @@
 const Boom = require('@hapi/boom');
 
 const DB = (request, colName) => request.mongo.db.collection(colName);
-const { cotizacionDB, DBproyectos } = require('../services/DB');
+const { DBproyectos } = require('../services/DB');
 const transform = (data) => {
 	return data.map((item) => {
 		return {
@@ -104,28 +104,7 @@ const modificarProyecto = async (request, h) =>
 	h.response('modificar proyectos, ');
 //++++++++++++++++++++++++++++++++++++++++++++
 
-// ++++++++++agregar foto+++++++++++++++++++++++
-// const agregarFoto = async (request, h) => {
-// 	const { cotizacionId, proyectoId, key, status, item } = request.payload;
-// 	console.log(cotizacionId, proyectoId, key);
-// 	const imgObj = {
-// 		key,
-// 		status,
-// 		item,
-// 	};
-// 	try {
-// 		const toMongo = await DB(request, 'proyectos').updateOne(
-// 			{
-// 				cotizacionId: parseInt(cotizacionId, 10),
-// 				proyectoId: parseInt(proyectoId, 10),
-// 			},
-// 			{ $push: { fotos: { $each: [imgObj], $sort: { item: 1, status: 1 } } } }
-// 		);
-// 		return { modified: toMongo.modifiedCount };
-// 	} catch (error) {
-// 		throw Boom.serverUnavailable('mongo not available');
-// 	}
-// };
+//+++++++++++Agregar Fotos++++++++++++++++++++++
 const agregarFoto = async (request, h) => {
 	const { cotizacionId, proyectoId, tipo, key } = request.payload;
 	const query = {
