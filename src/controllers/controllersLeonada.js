@@ -1,6 +1,6 @@
 const { uploadS3v4 } = require('../services/uploadV4');
 
-const getS3postController = async (request, h) => {
+exports.getS3postController = async (request, h) => {
 	console.log('REQUEST', request.payload);
 	const { cotizacionId, proyectoId, key } = request.payload;
 	console.log(cotizacionId);
@@ -11,6 +11,6 @@ const getS3postController = async (request, h) => {
 	return uploadS3v4(folder, key);
 };
 
-module.exports = {
-	getS3postController,
-};
+// module.exports = {
+// 	getS3postController,
+// };

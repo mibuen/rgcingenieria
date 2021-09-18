@@ -1,51 +1,47 @@
-const DB = (request, colName) => request.mongo.db.collection(colName);
 const Boom = require('@hapi/boom');
+const {
+	DBproyectos,
+	getCotizaciones,
+	getOneCotizacion,
+	insertCotizacion,
+} = require('../services/DB');
 
-const crearCotizacion = async (request, h) => {
+exports.crearCotizacion = async (request, h) => {
 	try {
-		const totalCotizaciones = await DB(request, 'cotizaciones')
-			.find({})
-			.count();
-		const cotizacionId = totalCotizaciones + 1;
+		const cotizacionArray = await getCotizaciones(request);
 		const data = request.payload;
-		data.cotizacionId = cotizacionId;
-		console.log(data);
-		await request.mongo.db
-			.collection('cotizaciones')
-			.createIndex({ cotizacionId: 1 }, { unique: true });
-		const cotizaciones = await DB(request, 'cotizaciones').insertOne(data);
-		return h.response(cotizaciones.ops[0]).code(201);
+		if (data.resuelta) new Date(`${data.resuelta}`);
+		data.emision = new Date(data.emision);
+		data.captura = new Date();
+		data.cotizacionId = cotizacionArray.length + 1;
+		console.log('TYPE', typeof data.cotizacionId);
+		return insertCotizacion(request, data);
 	} catch (error) {
-		throw Boom.badRequest('duplicate cotizaciones');
+		return Boom.badRequest('duplicate cotizaciones');
 	}
 };
 //#########################################################
 //+++++++++++++++++++Listar Cotizaciones++++++++++++++++++
-const listarCotizaciones = async (request, h) => {
+exports.listarCotizaciones = async (request, h) => {
 	try {
-		const listado = await DB(request, 'cotizaciones').find({}).toArray();
-		return h.response(listado).code(200);
+		return h.response(await getCotizaciones(request)).code(200);
 	} catch (error) {
-		Boom.badRequest('no existen cotizaciones');
+		return Boom.badRequest('no existen cotizaciones');
 	}
 };
-//#########################################################
-const getCotizacion = async (request, h) => {
+//################Get Cotizacion with project ID #########################################
+exports.getCotizacion = async (request, h) => {
 	const { cotizacionId } = request.params;
-	console.log(typeof cotizacionId);
 	try {
-		const cotizacion = await DB(request, 'cotizaciones').findOne({
+		const cotizacion = await getOneCotizacion(request, {
 			cotizacionId: parseInt(cotizacionId, 10),
 		});
-		return cotizacion
-			? cotizacion
-			: { message: ` cotizacion Id :${cotizacionId} do not exist` };
+		if (!cotizacion) throw Boom.badData('no existe cotizacion');
+		const proyectoId =
+			(await DBproyectos(request).find({ cotizacionId }).count()) + 1;
+		const headProyecto = { ...cotizacion, proyectoId };
+		return headProyecto;
 	} catch (error) {
-		console.log(error);
+		return error;
 	}
-};
-module.exports = {
-	crearCotizacion,
-	listarCotizaciones,
-	getCotizacion,
 };

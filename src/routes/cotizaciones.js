@@ -1,14 +1,8 @@
-const {
-	crearCotizacion,
-	listarCotizaciones,
-	getCotizacion,
-} = require('../controllers/controlCotizaciones');
-
 module.exports = [
 	{
 		method: 'POST',
 		path: '/cotizacion',
-		handler: crearCotizacion,
+		handler: require('../controllers/controlCotizaciones').crearCotizacion,
 		options: {
 			description: 'crear cotizacion en mongo',
 		},
@@ -17,15 +11,15 @@ module.exports = [
 	{
 		method: 'GET',
 		path: '/cotizaciones',
-		handler: listarCotizaciones,
+		handler: require('../controllers/controlCotizaciones').listarCotizaciones,
 		options: {
 			description: 'lista de cotizaciones',
 		},
 	},
 	{
 		method: 'GET',
-		path: '/cotizaciones/{cotizacionId}',
-		handler: getCotizacion,
+		path: '/cotizacion/{cotizacionId}',
+		handler: require('../controllers/controlCotizaciones').getCotizacion,
 		options: {
 			description: 'get Cotizacion',
 		},

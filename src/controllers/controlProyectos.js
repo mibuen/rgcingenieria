@@ -1,7 +1,7 @@
 const Boom = require('@hapi/boom');
 
 const DB = (request, colName) => request.mongo.db.collection(colName);
-
+const { cotizacionDB, DBproyectos } = require('../services/DB');
 const transform = (data) => {
 	return data.map((item) => {
 		return {
@@ -31,7 +31,7 @@ const existeProyecto = async (request, h) => {
 };
 //++++++++Crear Proyecto++++++++++++++++
 const crearProyecto = async (request, h) => {
-	const { payload } = request;
+	//const { payload } = request;
 	const { cotizacionId } = payload;
 	console.log('PAYLOAD', payload);
 	try {
@@ -42,7 +42,7 @@ const crearProyecto = async (request, h) => {
 		const checkQuotte = await DB(request, 'cotizaciones').findOne({
 			cotizacionId: parseInt(cotizacionId, 10),
 		});
-		if (!checkQuotte) throw Error;
+		if (!checkQuotte) throw Boom.badData;
 		const proyectoId =
 			(await DB(request, 'proyectos').find({ cotizacionId }).count()) + 1;
 		console.log('cotizacion', cotizacionId, 'proyectoId', proyectoId);
@@ -52,7 +52,7 @@ const crearProyecto = async (request, h) => {
 		const resultado = { ...checkQuotte, ...proyecto.ops[0] };
 		return resultado;
 	} catch (error) {
-		return { message: 'error gachote' };
+		return error;
 	}
 };
 //###################################################
@@ -62,7 +62,7 @@ const inactivarProyecto = async (request, h) =>
 //++++++++++++++++++++++++++++++
 const listaProyectos = async (request, h) => {
 	try {
-		const data = await DB(request, 'proyectos')
+		const data = await DBproyectos(request)
 			.aggregate([
 				{
 					$lookup: {
@@ -84,16 +84,19 @@ const listaProyectos = async (request, h) => {
 };
 //+++++++++++++++++++++
 const getProyecto = async (request, h) => {
-	const { proyectoId } = request.params;
+	const { proyecto } = request.params;
+	const [cotizacionId, proyectoId] = proyecto.split('-');
 	try {
-		const proyecto = await DB(request, 'proyectos').findOne({
+		const proyecto = await DBproyectos(request).findOne({
+			cotizacionId: parseInt(cotizacionId, 10),
 			proyectoId: parseInt(proyectoId, 10),
 		});
 		return proyecto
 			? h.response(proyecto).code(200)
-			: h.response({ message: 'proyecto no existe' });
+			: Boom.badData('proyecto no existe');
 	} catch (error) {
 		console.log(error);
+		return error;
 	}
 };
 // ++++++++++++++++++++++++++++++
@@ -130,7 +133,7 @@ const agregarFoto = async (request, h) => {
 		proyectoId: parseInt(proyectoId, 10),
 	};
 	try {
-		if (tipo !== 'inicio') throw Error('tipo foto no es inicio');
+		if (tipo !== 'inicio') throw Boom.notAcceptable('tipo foto no es inicio');
 		const proyecto = await DB(request, 'proyectos').findOne(query);
 		const item = proyecto.vistas ? proyecto.vistas.length : 1;
 		console.log(item);
@@ -139,7 +142,7 @@ const agregarFoto = async (request, h) => {
 		});
 		return { modified: toMongo.modifiedCount };
 	} catch (error) {
-		return Boom.badData(error);
+		return error;
 	}
 };
 //return 'message quien sabe';

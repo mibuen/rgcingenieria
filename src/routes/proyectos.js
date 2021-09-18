@@ -1,19 +1,8 @@
-const {
-	crearProyecto,
-	inactivarProyecto,
-	listaProyectos,
-	modificarProyecto,
-	agregarFoto,
-	getProyecto,
-	creaReporte,
-	existeProyecto,
-} = require('../controllers/controlProyectos');
-
 module.exports = [
 	{
 		method: 'POST',
 		path: '/proyecto',
-		handler: crearProyecto,
+		handler: require('../controllers/controlProyectos').crearProyecto,
 		options: {
 			description: 'crear proyecto en mongo',
 		},
@@ -21,12 +10,15 @@ module.exports = [
 	{
 		method: 'GET',
 		path: '/verificar/{proyectoId}',
-		handler: existeProyecto,
+		handler: require('../controllers/controlProyectos').existeProyecto,
+		options: {
+			description: 'verificar existencia proyecto',
+		},
 	},
 	{
 		method: 'GET',
 		path: '/inactivar',
-		handler: inactivarProyecto,
+		handler: require('../controllers/controlProyectos').inactivarProyecto,
 		options: {
 			description: 'inactivar proyecto en mongo',
 		},
@@ -34,15 +26,15 @@ module.exports = [
 	{
 		method: 'GET',
 		path: '/listado',
-		handler: listaProyectos,
+		handler: require('../controllers/controlProyectos').listaProyectos,
 		options: {
 			description: 'lista proyectos en mongo',
 		},
 	},
 	{
 		method: 'GET',
-		path: '/listado/{proyectoId}',
-		handler: getProyecto,
+		path: '/listado/{proyecto}',
+		handler: require('../controllers/controlProyectos').getProyecto,
 		options: {
 			description: 'lista un proyecto en mongo',
 		},
@@ -51,7 +43,7 @@ module.exports = [
 	{
 		method: 'GET',
 		path: '/modificar',
-		handler: modificarProyecto,
+		handler: require('../controllers/controlProyectos').modificarProyecto,
 		options: {
 			description: 'modificar proyecto en mongo',
 		},
@@ -59,7 +51,7 @@ module.exports = [
 	{
 		method: 'POST',
 		path: '/agregarfoto',
-		handler: agregarFoto,
+		handler: require('../controllers/controlProyectos').agregarFoto,
 		options: {
 			description: 'upload fotos',
 		},
@@ -67,7 +59,7 @@ module.exports = [
 	{
 		method: 'POST',
 		path: '/reporte',
-		handler: creaReporte,
+		handler: require('../controllers/controlProyectos').creaReporte,
 		options: {
 			description: 'modifica campos foto',
 		},
