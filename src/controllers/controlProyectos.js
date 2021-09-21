@@ -1,24 +1,13 @@
 const Boom = require('@hapi/boom');
 
 const DB = (request, colName) => request.mongo.db.collection(colName);
-const { DBproyectos } = require('../services/DB');
-const transform = (data) => {
-	return data.map((item) => {
-		return {
-			cotizacionId: item.cotizacionId,
-			proyectoId: item.proyectoId,
-			cliente: item.proyectos_ready.cliente,
-			trabajo: item.proyectos_ready.trabajo,
-			sitio: item.sitio,
-			direccion: item.direccion,
-			supervisor: item.supervisor,
-			status_proyecto: item.status_proyecto,
-			fecha_inicio: item.fechaInicio,
-			fecha_terminado: item.fechaTerminado,
-			vistas: item.vistas ? item.vistas.length : 0,
-		};
-	});
-};
+const {
+	getDbResource,
+	insertDbResource,
+	getAllDbResources,
+	DBindex,
+} = require('../services/DB');
+const { transform } = require('../services/helpers');
 
 const existeProyecto = async (request, h) => {
 	const { proyectoId } = request.params;
@@ -31,51 +20,45 @@ const existeProyecto = async (request, h) => {
 };
 //++++++++Crear Proyecto++++++++++++++++
 const crearProyecto = async (request, h) => {
-	//const { payload } = request;
-	const { cotizacionId } = payload;
-	console.log('PAYLOAD', payload);
+	const { payload } = request;
 	try {
-		await DB(request, 'proyectos').createIndex(
-			{ cotizacionId: 1, proyectoId: 1 },
-			{ unique: true }
-		);
-		const checkQuotte = await DB(request, 'cotizaciones').findOne({
-			cotizacionId: parseInt(cotizacionId, 10),
-		});
-		if (!checkQuotte) throw Boom.badData;
-		const proyectoId =
-			(await DB(request, 'proyectos').find({ cotizacionId }).count()) + 1;
-		console.log('cotizacion', cotizacionId, 'proyectoId', proyectoId);
-		payload.proyectoId = proyectoId;
-		const proyecto = await DB(request, 'proyectos').insertOne(payload);
-		console.log(checkQuotte, proyecto.ops[0]);
-		const resultado = { ...checkQuotte, ...proyecto.ops[0] };
-		return resultado;
+		await DBindex(request, 'proyectos', { cotizacionId: 1, proyectoId: 1 });
+		payload.cotizacionId = parseInt(payload.cotizacionId, 10);
+		payload.proyectoId = parseInt(payload.proyectoId, 10);
+		payload.createdDate = new Date();
+		if (payload.inicio) new Date(`${payload.inicio}`);
+		if (payload.terminado) new Date(`${payload.terminado}`);
+		const saved = await insertDbResource(request, 'proyectos', payload);
+		return h
+			.response({
+				proyecto: `${saved.ops[0].cotizacionId}-${saved.ops[0].proyectoId}`,
+			})
+			.code(201);
 	} catch (error) {
-		return error;
+		console.log(error);
+		return error.code === 11000
+			? Boom.conflict('E:1100 proyecto ya existe en db')
+			: error;
 	}
 };
-//###################################################
-//++++++++++Inactivar
-const inactivarProyecto = async (request, h) =>
-	h.response('proyecto inactivado');
-//++++++++++++++++++++++++++++++
+
+//++++++++++++++++++++++++++++++Lista Proyectos+++++++++++++
 const listaProyectos = async (request, h) => {
 	try {
-		const data = await DBproyectos(request)
-			.aggregate([
-				{
-					$lookup: {
-						from: 'cotizaciones',
-						localField: 'cotizacionId',
-						foreignField: 'cotizacionId',
-						as: 'proyectos_ready',
-					},
+		const data = await getAllDbResources(
+			request,
+			'proyectos',
+			{
+				$lookup: {
+					from: 'cotizaciones',
+					localField: 'cotizacionId',
+					foreignField: 'cotizacionId',
+					as: 'proyectos_ready',
 				},
-				{ $unwind: '$proyectos_ready' },
-				{ $sort: { cotizacionId: 1, proyectoId: 1 } },
-			])
-			.toArray();
+			},
+			{ $unwind: '$proyectos_ready' },
+			{ $sort: { cotizacionId: 1, proyectoId: 1 } }
+		);
 		const proyectos = transform(data);
 		return h.response(proyectos).code(200);
 	} catch (error) {
@@ -87,7 +70,7 @@ const getProyecto = async (request, h) => {
 	const { proyecto } = request.params;
 	const [cotizacionId, proyectoId] = proyecto.split('-');
 	try {
-		const proyecto = await DBproyectos(request).findOne({
+		const proyecto = await getDbResource(request, 'proyectos', {
 			cotizacionId: parseInt(cotizacionId, 10),
 			proyectoId: parseInt(proyectoId, 10),
 		});
@@ -99,10 +82,6 @@ const getProyecto = async (request, h) => {
 		return error;
 	}
 };
-// ++++++++++++++++++++++++++++++
-const modificarProyecto = async (request, h) =>
-	h.response('modificar proyectos, ');
-//++++++++++++++++++++++++++++++++++++++++++++
 
 //+++++++++++Agregar Fotos++++++++++++++++++++++
 const agregarFoto = async (request, h) => {
@@ -145,6 +124,13 @@ const creaReporte = async (request, h) => {
 		throw error;
 	}
 };
+//++++++++++Inactivar
+const inactivarProyecto = async (request, h) =>
+	h.response('proyecto inactivado');
+// ++++++++++++++++++++++++++++++
+const modificarProyecto = async (request, h) =>
+	h.response('modificar proyectos, ');
+//++++++++++++++++++++++++++++++++++++++++++++
 
 module.exports = {
 	crearProyecto,

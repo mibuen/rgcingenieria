@@ -1,45 +1,57 @@
 const Boom = require('@hapi/boom');
 const {
-	DBproyectos,
-	getCotizaciones,
-	getOneCotizacion,
-	insertCotizacion,
+	getDbResource,
+	insertDbResource,
+	DbIndex,
+	getAllDbResources,
 } = require('../services/DB');
 
 exports.crearCotizacion = async (request, h) => {
+	const data = request.payload;
 	try {
-		const cotizacionArray = await getCotizaciones(request);
-		const data = request.payload;
+		await DBindex(request, 'cotizaciones', { cotizacionId: 1 });
+		const cotizacionArray = await getAllDbResources(request, 'cotizaciones', {
+			$match: {},
+		});
+		data.cotizacionId = cotizacionArray.length + 1;
 		if (data.resuelta) new Date(`${data.resuelta}`);
 		data.emision = new Date(data.emision);
 		data.captura = new Date();
-		data.cotizacionId = cotizacionArray.length + 1;
-		return insertCotizacion(request, data);
+		const savedCotizacion = await insertDbResource(
+			request,
+			'cotizaciones',
+			data
+		);
+		return h
+			.response({ cotizacionId: savedCotizacion.ops[0].cotizacionId })
+			.code(201);
 	} catch (error) {
-		return Boom.badRequest('duplicate cotizaciones');
+		console.log(error);
+		return Boom.badRequest('cotizacion was not saved');
 	}
 };
 //#########################################################
 //+++++++++++++++++++Listar Cotizaciones++++++++++++++++++
 exports.listarCotizaciones = async (request, h) => {
 	try {
-		return h.response(await getCotizaciones(request)).code(200);
+		const cotizaciones = await getAllDbResources(request, 'cotizaciones', {
+			$match: {},
+		});
+		//console.log(cotizaciones);
+		return h.response(cotizaciones).code(200);
 	} catch (error) {
 		return Boom.badRequest('no existen cotizaciones');
 	}
 };
-//################Get Cotizacion with project ID #########################################
+//################Get Cotizacion with project ID
 exports.getCotizacion = async (request, h) => {
 	const { cotizacionId } = request.params;
 	try {
-		const cotizacion = await getOneCotizacion(request, {
+		const cotizacion = await getDbResource(request, 'cotizaciones', {
 			cotizacionId: parseInt(cotizacionId, 10),
 		});
 		if (!cotizacion) throw Boom.badData('no existe cotizacion');
-		const proyectoId =
-			(await DBproyectos(request).find({ cotizacionId }).count()) + 1;
-		const headProyecto = { ...cotizacion, proyectoId };
-		return headProyecto;
+		return h.response(cotizacion).code(200);
 	} catch (error) {
 		return error;
 	}
