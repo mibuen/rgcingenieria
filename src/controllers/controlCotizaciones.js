@@ -2,7 +2,7 @@ const Boom = require('@hapi/boom');
 const {
 	getDbResource,
 	insertDbResource,
-	DbIndex,
+	DBindex,
 	getAllDbResources,
 } = require('../services/DB');
 
