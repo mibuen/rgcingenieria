@@ -6,6 +6,7 @@ const {
 	insertDbResource,
 	getAllDbResources,
 	DBindex,
+	updateDbResource,
 } = require('../services/DB');
 const { transform } = require('../services/helpers');
 
@@ -65,7 +66,15 @@ const listaProyectos = async (request, h) => {
 		console.log(error);
 	}
 };
-//+++++++++++++++++++++
+const proyectsInCotizacion = async (request, h) => {
+	console.log(request.params);
+	const { cotizacionId } = request.params;
+	console.log('COT', cotizacionId);
+	const pipe = { $match: { cotizacionId: parseInt(cotizacionId, 10) } };
+	const proyects = await getAllDbResources(request, 'proyectos', pipe);
+	return proyects;
+};
+//+++++++++++++++++++++Get proyecto by ID cotID-prjId
 const getProyecto = async (request, h) => {
 	const { proyecto } = request.params;
 	const [cotizacionId, proyectoId] = proyecto.split('-');
@@ -127,9 +136,21 @@ const creaReporte = async (request, h) => {
 //++++++++++Inactivar
 const inactivarProyecto = async (request, h) =>
 	h.response('proyecto inactivado');
-// ++++++++++++++++++++++++++++++
-const modificarProyecto = async (request, h) =>
-	h.response('modificar proyectos, ');
+// ++++++++++++++++++++++++++++++Modificar Proyecto
+const modificarProyecto = async (request, h) => {
+	const { payload } = request;
+	const { cotizacionId, proyectoId } = payload;
+	delete payload.cotizacionId;
+	delete payload.proyectoId;
+	const modified = await updateDbResource(
+		request,
+		'proyectos',
+		{ cotizacionId, proyectoId },
+		payload
+	);
+	return h.response(modified);
+};
+
 //++++++++++++++++++++++++++++++++++++++++++++
 
 module.exports = {
@@ -141,4 +162,5 @@ module.exports = {
 	getProyecto,
 	creaReporte,
 	existeProyecto,
+	proyectsInCotizacion,
 };

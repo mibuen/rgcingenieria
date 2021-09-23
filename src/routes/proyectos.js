@@ -33,6 +33,14 @@ module.exports = [
 	},
 	{
 		method: 'GET',
+		path: '/proyectos/{cotizacionId}',
+		handler: require('../controllers/controlProyectos').proyectsInCotizacion,
+		options: {
+			description: 'lista proyectos por cotizacion',
+		},
+	},
+	{
+		method: 'GET',
 		path: '/listado/{proyecto}',
 		handler: require('../controllers/controlProyectos').getProyecto,
 		options: {
@@ -41,7 +49,7 @@ module.exports = [
 	},
 
 	{
-		method: 'GET',
+		method: 'POST',
 		path: '/modificar',
 		handler: require('../controllers/controlProyectos').modificarProyecto,
 		options: {
