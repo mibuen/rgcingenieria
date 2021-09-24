@@ -53,7 +53,7 @@ module.exports = [
 		path: '/modificar',
 		handler: require('../controllers/controlProyectos').modificarProyecto,
 		options: {
-			description: 'modificar proyecto en mongo',
+			description: 'modificar-guarda(sitio, supervisor,etc)proyecto',
 		},
 	},
 	{

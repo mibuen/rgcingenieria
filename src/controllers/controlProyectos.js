@@ -145,7 +145,10 @@ const modificarProyecto = async (request, h) => {
 	const modified = await updateDbResource(
 		request,
 		'proyectos',
-		{ cotizacionId, proyectoId },
+		{
+			cotizacionId: parseInt(cotizacionId, 10),
+			proyectoId: parseInt(proyectoId, 10),
+		},
 		payload
 	);
 	return h.response(modified);
