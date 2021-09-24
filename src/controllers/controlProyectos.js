@@ -142,6 +142,8 @@ const modificarProyecto = async (request, h) => {
 	const { cotizacionId, proyectoId } = payload;
 	delete payload.cotizacionId;
 	delete payload.proyectoId;
+	if (payload.inicio) new Date(`${payload.inicio}`);
+	if (payload.terminado) new Date(`${payload.terminado}`);
 	const modified = await updateDbResource(
 		request,
 		'proyectos',
