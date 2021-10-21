@@ -25,7 +25,7 @@ module.exports = [
 	},
 	{
 		method: 'GET',
-		path: '/listado',
+		path: '/listado_proyectos',
 		handler: require('../controllers/controlProyectos').listaProyectos,
 		options: {
 			description: 'lista proyectos en mongo',

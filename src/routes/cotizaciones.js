@@ -1,27 +1,27 @@
 module.exports = [
 	{
 		method: 'POST',
-		path: '/cotizacion',
+		path: '/cotizacion-nueva',
 		handler: require('../controllers/controlCotizaciones').crearCotizacion,
 		options: {
-			description: 'crear cotizacion en mongo',
+			description: 'nueva cotizacion en mongo',
 		},
 	},
 
 	{
 		method: 'GET',
-		path: '/cotizaciones',
-		handler: require('../controllers/controlCotizaciones').listarCotizaciones,
+		path: '/cotizaciones/{cotizacionId?}',
+		handler: require('../controllers/controlCotizaciones').getCotizacion,
 		options: {
-			description: 'lista de cotizaciones',
+			description: 'get Cotizaciones o Cotizacion',
 		},
 	},
 	{
-		method: 'GET',
-		path: '/cotizacion/{cotizacionId}',
-		handler: require('../controllers/controlCotizaciones').getCotizacion,
+		method: 'PUT',
+		path: '/modifica-cotizacion/{cotizacionId}',
+		handler: require('../controllers/controlCotizaciones').modificaCotizacion,
 		options: {
-			description: 'get Cotizacion',
+			description: 'modifica cotizacion',
 		},
 	},
 ];
