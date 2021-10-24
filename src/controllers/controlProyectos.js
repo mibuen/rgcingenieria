@@ -70,7 +70,19 @@ const proyectsInCotizacion = async (request, h) => {
 	console.log(request.params);
 	const { cotizacionId } = request.params;
 	console.log('COT', cotizacionId);
-	const pipe = { $match: { cotizacionId: parseInt(cotizacionId, 10) } };
+	const pipe = [
+		{ $match: { cotizacionId: parseInt(cotizacionId, 10) } },
+		{
+			$lookup: {
+				from: 'cotizaciones',
+				localField: 'cotizacionId',
+				foreignField: 'cotizacionId',
+				as: 'proyectos_ready',
+			},
+		},
+		{ $unwind: '$proyectos_ready' },
+		{ $sort: { proyectoId: 1 } },
+	];
 	const proyects = await getAllDbResources(request, 'proyectos', pipe);
 	return proyects;
 };

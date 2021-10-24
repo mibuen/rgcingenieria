@@ -44,7 +44,9 @@ exports.modificaCotizacion = async (request, h) => {
 			{ cotizacionId: parseInt(cotizacionId, 10) },
 			payload
 		);
-		return h.response({ modifiedCount: cotizacion.modifiedCount }).code(202);
+		return h
+			.response({ modifiedCount: cotizacion.modifiedCount, cotizacionId })
+			.code(202);
 	} catch (error) {
 		return Boom.badRequest();
 	}
@@ -56,6 +58,7 @@ exports.getCotizacion = async (request, h) => {
 		throw Boom.badData('string not accepted');
 	if (!request.params.cotizacionId.match(reg))
 		throw Boom.badData('string not accepted');
+	console.log('PARAMS', request.params);
 	const cotizacionId = parseInt(request.params.cotizacionId, 10);
 	const data = cotizacionId ? { cotizacionId: cotizacionId } : {};
 
