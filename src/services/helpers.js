@@ -8,9 +8,9 @@ exports.transform = (data) => {
 			sitio: item.sitio,
 			direccion: item.direccion,
 			supervisor: item.supervisor,
-			status_proyecto: item.status_proyecto,
-			fecha_inicio: item.fechaInicio,
-			fecha_terminado: item.fechaTerminado,
+			status: item.status,
+			inicio: item.inicio,
+			terminado: item.terminado,
 			vistas: item.vistas ? item.vistas.length : 0,
 		};
 	});

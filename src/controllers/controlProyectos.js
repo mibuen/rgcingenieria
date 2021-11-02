@@ -27,8 +27,8 @@ const crearProyecto = async (request, h) => {
 		payload.cotizacionId = parseInt(payload.cotizacionId, 10);
 		payload.proyectoId = parseInt(payload.proyectoId, 10);
 		payload.createdDate = new Date();
-		if (payload.inicio) new Date(`${payload.inicio}`);
-		if (payload.terminado) new Date(`${payload.terminado}`);
+		// payload.inicio = new Date(`${payload.inicio}`);
+		// payload.terminado = new Date(`${payload.terminado}`);
 		const saved = await insertDbResource(request, 'proyectos', payload);
 		return h
 			.response({
@@ -41,6 +41,33 @@ const crearProyecto = async (request, h) => {
 			? Boom.conflict('E:1100 proyecto ya existe en db')
 			: error;
 	}
+};
+// ++++++++++++++++++++++####Modificar Proyecto####+++++++++
+const modificarProyecto = async (request, h) => {
+	const { payload } = request;
+	const { cotizacionId, proyectoId } = payload;
+	delete payload.cotizacionId;
+	delete payload.proyectoId;
+	payload.inicio = Date(payload.inicio);
+	payload.terminado = new Date(payload.terminado);
+	const modified = await updateDbResource(
+		request,
+		'proyectos',
+		{
+			cotizacionId: parseInt(cotizacionId, 10),
+			proyectoId: parseInt(proyectoId, 10),
+		},
+		payload
+	);
+	return modified.modifiedCount > 0
+		? h
+				.response({
+					cotizacion: cotizacionId,
+					proyecto: proyectoId,
+					message: 'modificado',
+				})
+				.code(202)
+		: Boom.badRequest('modificacion invalida');
 };
 
 //++++++++++++++++++++++++++++++Lista Proyectos+++++++++++++
@@ -66,6 +93,7 @@ const listaProyectos = async (request, h) => {
 		console.log(error);
 	}
 };
+//+++++++++Proyects in cotizacion+++++++++++++++
 const proyectsInCotizacion = async (request, h) => {
 	console.log(request.params);
 	const { cotizacionId } = request.params;
@@ -84,7 +112,9 @@ const proyectsInCotizacion = async (request, h) => {
 		{ $sort: { proyectoId: 1 } },
 	];
 	const proyects = await getAllDbResources(request, 'proyectos', pipe);
-	return proyects;
+	return proyects.length > 0
+		? proyects
+		: Boom.notFound('cotizacion sin proyectos');
 };
 //+++++++++++++++++++++Get proyecto by ID cotID-prjId
 const getProyecto = async (request, h) => {
@@ -148,25 +178,6 @@ const creaReporte = async (request, h) => {
 //++++++++++Inactivar
 const inactivarProyecto = async (request, h) =>
 	h.response('proyecto inactivado');
-// ++++++++++++++++++++++++++++++Modificar Proyecto
-const modificarProyecto = async (request, h) => {
-	const { payload } = request;
-	const { cotizacionId, proyectoId } = payload;
-	delete payload.cotizacionId;
-	delete payload.proyectoId;
-	if (payload.inicio) new Date(`${payload.inicio}`);
-	if (payload.terminado) new Date(`${payload.terminado}`);
-	const modified = await updateDbResource(
-		request,
-		'proyectos',
-		{
-			cotizacionId: parseInt(cotizacionId, 10),
-			proyectoId: parseInt(proyectoId, 10),
-		},
-		payload
-	);
-	return h.response(modified);
-};
 
 //++++++++++++++++++++++++++++++++++++++++++++
 

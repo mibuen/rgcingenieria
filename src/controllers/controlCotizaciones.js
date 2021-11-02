@@ -63,9 +63,11 @@ exports.getCotizacion = async (request, h) => {
 	const data = cotizacionId ? { cotizacionId: cotizacionId } : {};
 
 	try {
-		const cotizacion = await getAllDbResources(request, 'cotizaciones', {
-			$match: data,
-		});
+		const cotizacion = await getAllDbResources(request, 'cotizaciones', [
+			{
+				$match: data,
+			},
+		]);
 		if (cotizacion.length !== 0) {
 			return h.response(cotizacion).code(200);
 		} else {
@@ -75,30 +77,3 @@ exports.getCotizacion = async (request, h) => {
 		throw error;
 	}
 };
-//#####################################################
-
-// exports.getCotizacion = async (request, h) => {
-// 	const { cotizacionId } = request.params;
-// 	try {
-// 		const cotizacion = await getDbResource(request, 'cotizaciones', {
-// 			cotizacionId: parseInt(cotizacionId, 10),
-// 		});
-// 		if (!cotizacion) throw Boom.badData('no existe cotizacion');
-// 		return h.response(cotizacion).code(200);
-// 	} catch (error) {
-// 		return error;
-// 	}
-// };
-
-//+++++++++++++++++++Listar Cotizaciones++++++++++++++++++
-// exports.listarCotizaciones = async (request, h) => {
-// 	try {
-// 		const cotizaciones = await getAllDbResources(request, 'cotizaciones', {
-// 			$match: {},
-// 		});
-// 		//console.log(cotizaciones);
-// 		return h.response(cotizaciones).code(200);
-// 	} catch (error) {
-// 		return Boom.badRequest('no existen cotizaciones');
-// 	}
-// };

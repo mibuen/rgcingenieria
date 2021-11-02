@@ -14,7 +14,7 @@ exports.getDbResource = (request, col, data) => DB(request, col).findOne(data);
 
 exports.getAllDbResources = (request, col, pipeline) => {
 	console.log('PIPe', pipeline);
-	return DB(request, col).aggregate([pipeline]).toArray();
+	return DB(request, col).aggregate(pipeline).toArray();
 };
 
 exports.insertDbResource = (request, col, data) =>
