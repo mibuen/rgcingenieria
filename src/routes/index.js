@@ -1,4 +1,4 @@
-const leonada = require('./leonada');
+const fotos = require('./fotos');
 const controlProyectos = require('./proyectos');
 const cotizaciones = require('./cotizaciones');
 
@@ -11,4 +11,4 @@ const mainpage = {
 	},
 };
 
-module.exports = [mainpage, ...controlProyectos, ...leonada, ...cotizaciones];
+module.exports = [mainpage, ...controlProyectos, ...fotos, ...cotizaciones];

@@ -56,14 +56,7 @@ module.exports = [
 			description: 'modificar-guarda(sitio, supervisor,etc)proyecto',
 		},
 	},
-	{
-		method: 'POST',
-		path: '/agregarfoto',
-		handler: require('../controllers/controlProyectos').agregarFoto,
-		options: {
-			description: 'upload fotos',
-		},
-	},
+
 	{
 		method: 'POST',
 		path: '/reporte',

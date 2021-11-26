@@ -11,13 +11,18 @@ const {
 const { transform } = require('../services/helpers');
 
 const existeProyecto = async (request, h) => {
-	const { proyectoId } = request.params;
-	const response = await DB(request, 'proyectos')
-		.find({ proyectoId: parseInt(proyectoId, 10) })
+	const { cotizacionId, proyectoId } = request.payload;
+	console.log(cotizacionId, proyectoId);
+	const result = await DB(request, 'proyectos')
+		.find({
+			cotizacionId: parseInt(cotizacionId, 10),
+			proyectoId: parseInt(proyectoId, 10),
+		})
 		.count();
-	return response !== 1
-		? h.response({ message: 'proyecto no existe' })
-		: h.response({ message: 'proyecto valido' });
+	console.log(result);
+	return result !== 1
+		? { message: 'proyecto no existe' }
+		: { message: 'proyecto valido' };
 };
 //++++++++Crear Proyecto++++++++++++++++
 const crearProyecto = async (request, h) => {
@@ -27,8 +32,12 @@ const crearProyecto = async (request, h) => {
 		payload.cotizacionId = parseInt(payload.cotizacionId, 10);
 		payload.proyectoId = parseInt(payload.proyectoId, 10);
 		payload.createdDate = new Date();
-		// payload.inicio = new Date(`${payload.inicio}`);
-		// payload.terminado = new Date(`${payload.terminado}`);
+		//check cotizacion ganada
+		const ganada = await getDbResource(request, 'cotizaciones', {
+			cotizacionId: payload.cotizacionId,
+			status: 'ganada',
+		});
+		if (!ganada) throw Boom.notAcceptable('cotizacion no ganada');
 		const saved = await insertDbResource(request, 'proyectos', payload);
 		return h
 			.response({
@@ -49,7 +58,7 @@ const modificarProyecto = async (request, h) => {
 	delete payload.cotizacionId;
 	delete payload.proyectoId;
 	payload.inicio = Date(payload.inicio);
-	payload.terminado = new Date(payload.terminado);
+	payload.terminado = Date(payload.terminado);
 	const modified = await updateDbResource(
 		request,
 		'proyectos',
@@ -57,8 +66,9 @@ const modificarProyecto = async (request, h) => {
 			cotizacionId: parseInt(cotizacionId, 10),
 			proyectoId: parseInt(proyectoId, 10),
 		},
-		payload
+		[{ $set: payload }]
 	);
+	console.log(modified);
 	return modified.modifiedCount > 0
 		? h
 				.response({
@@ -134,27 +144,12 @@ const getProyecto = async (request, h) => {
 	}
 };
 
-//+++++++++++Agregar Fotos++++++++++++++++++++++
-const agregarFoto = async (request, h) => {
-	const { cotizacionId, proyectoId, tipo, key } = request.payload;
-	const query = {
-		cotizacionId: parseInt(cotizacionId, 10),
-		proyectoId: parseInt(proyectoId, 10),
-	};
-	try {
-		if (tipo !== 'inicio') throw Boom.notAcceptable('tipo foto no es inicio');
-		const proyecto = await DB(request, 'proyectos').findOne(query);
-		const item = proyecto.vistas ? proyecto.vistas.length : 1;
-		console.log(item);
-		const toMongo = await DB(request, 'proyectos').updateOne(query, {
-			$push: { vistas: { item, inicio: key, final: 'tbd.png' } },
-		});
-		return { modified: toMongo.modifiedCount };
-	} catch (error) {
-		return error;
-	}
-};
-//return 'message quien sabe';
+//++++++++++Inactivar
+const inactivarProyecto = async (request, h) =>
+	h.response('proyecto inactivado');
+
+//++++++++++++++++++++++++++++++++++++++++++++
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const creaReporte = async (request, h) => {
 	const { proyectoId, key, item, status, comentarios } = request.payload;
@@ -175,18 +170,11 @@ const creaReporte = async (request, h) => {
 		throw error;
 	}
 };
-//++++++++++Inactivar
-const inactivarProyecto = async (request, h) =>
-	h.response('proyecto inactivado');
-
-//++++++++++++++++++++++++++++++++++++++++++++
-
 module.exports = {
 	crearProyecto,
 	inactivarProyecto,
 	listaProyectos,
 	modificarProyecto,
-	agregarFoto,
 	getProyecto,
 	creaReporte,
 	existeProyecto,

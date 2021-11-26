@@ -13,7 +13,7 @@ const DB = (request, col) => request.mongo.db.collection(col);
 exports.getDbResource = (request, col, data) => DB(request, col).findOne(data);
 
 exports.getAllDbResources = (request, col, pipeline) => {
-	console.log('PIPe', pipeline);
+	//console.log('PIPe', pipeline);
 	return DB(request, col).aggregate(pipeline).toArray();
 };
 
@@ -21,5 +21,7 @@ exports.insertDbResource = (request, col, data) =>
 	DB(request, col).insertOne(data);
 
 exports.updateDbResource = (request, col, query, data) => {
-	return DB(request, col).updateOne(query, { $set: data });
+	//	console.log(data);
+	return DB(request, col).updateOne(query, data);
+	//return DB(request, col).updateOne(query, { $set: data });
 };
