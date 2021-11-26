@@ -24,6 +24,7 @@ exports.getS3postController = async (request, h) => {
 exports.agregarFoto = async (request, h) => {
 	const tipos = ['inicio', 'final'];
 	const { cotizacionId, proyectoId, tipo, seq, key } = request.payload;
+	console.log('SINSEQ', seq);
 	console.log(cotizacionId, proyectoId, tipo, key);
 	const query = {
 		cotizacionId: parseInt(cotizacionId, 10),
@@ -35,17 +36,19 @@ exports.agregarFoto = async (request, h) => {
 			throw Boom.notAcceptable('tipo foto no es inicio o final');
 
 		const proyecto = await getDbResource(request, 'proyectos', query);
-		//console.log('PROYECTO', proyecto);
+		console.log('PROYECTO', proyecto);
 		if (!proyecto) throw Boom.notFound('proyecto no existe');
 
 		const item = proyecto.vistas ? proyecto.vistas.length + 1 : 1;
+
 		const updateInicio = {
 			$push: { vistas: { item, inicio: key, final: 'tbd.png' } },
 		};
-		query['vistas.item'] = seq;
+		if (seq) query['vistas.item'] = seq;
 		const updateFinal = {
 			$set: { 'vistas.$.final': key },
 		};
+		console.log('INFOUPDATE', tipo === 'inicio' ? updateInicio : updateFinal);
 		const toMongo = await updateDbResource(
 			request,
 			'proyectos',
