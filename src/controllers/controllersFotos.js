@@ -23,6 +23,7 @@ exports.getS3postController = async (request, h) => {
 //+++++++++++Agregar Fotos++++++++++++++++++++++
 exports.agregarFoto = async (request, h) => {
 	const tipos = ['inicio', 'final'];
+	console.log('PAYLOAD', request.payload);
 	const { cotizacionId, proyectoId, tipo, seq, key } = request.payload;
 	console.log('SINSEQ', seq);
 	console.log(cotizacionId, proyectoId, tipo, key);

@@ -21,7 +21,7 @@ exports.insertDbResource = (request, col, data) =>
 	DB(request, col).insertOne(data);
 
 exports.updateDbResource = (request, col, query, data) => {
-	//	console.log(data);
+	console.log(data);
 	return DB(request, col).updateOne(query, data);
 	//return DB(request, col).updateOne(query, { $set: data });
 };

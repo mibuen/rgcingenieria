@@ -56,13 +56,4 @@ module.exports = [
 			description: 'modificar-guarda(sitio, supervisor,etc)proyecto',
 		},
 	},
-
-	{
-		method: 'POST',
-		path: '/reporte',
-		handler: require('../controllers/controlProyectos').creaReporte,
-		options: {
-			description: 'modifica campos foto',
-		},
-	},
 ];

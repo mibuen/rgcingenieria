@@ -42,7 +42,7 @@ exports.modificaCotizacion = async (request, h) => {
 			request,
 			'cotizaciones',
 			{ cotizacionId: parseInt(cotizacionId, 10) },
-			payload
+			{ $set: payload }
 		);
 		return h
 			.response({ modifiedCount: cotizacion.modifiedCount, cotizacionId })

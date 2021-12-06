@@ -54,6 +54,7 @@ const crearProyecto = async (request, h) => {
 // ++++++++++++++++++++++####Modificar Proyecto####+++++++++
 const modificarProyecto = async (request, h) => {
 	const { payload } = request;
+	// console.log(payload);
 	const { cotizacionId, proyectoId } = payload;
 	delete payload.cotizacionId;
 	delete payload.proyectoId;
@@ -68,7 +69,7 @@ const modificarProyecto = async (request, h) => {
 		},
 		[{ $set: payload }]
 	);
-	console.log(modified);
+	//console.log(modified);
 	return modified.modifiedCount > 0
 		? h
 				.response({
@@ -151,32 +152,13 @@ const inactivarProyecto = async (request, h) =>
 //++++++++++++++++++++++++++++++++++++++++++++
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-const creaReporte = async (request, h) => {
-	const { proyectoId, key, item, status, comentarios } = request.payload;
-	const query = { proyectoId: parseInt(proyectoId, 10), 'fotos.key': key };
-	const data = {
-		'fotos.$.item': item,
-		'fotos.$.comentarios': comentarios,
-		'fotos.$.status': status,
-	};
-	try {
-		await DB(request, 'proyectos').updateOne(query, { $set: data });
-		const sortedReport = await DB(request, 'proyectos').updateOne(query, {
-			$push: { fotos: { $each: [], $sort: { item: 1, status: -1 } } },
-		});
-		return h.response(sortedReport).code(201);
-	} catch (error) {
-		console.log(error);
-		throw error;
-	}
-};
+
 module.exports = {
 	crearProyecto,
 	inactivarProyecto,
 	listaProyectos,
 	modificarProyecto,
 	getProyecto,
-	creaReporte,
 	existeProyecto,
 	proyectsInCotizacion,
 };
